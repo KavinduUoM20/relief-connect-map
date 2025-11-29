@@ -1,0 +1,6 @@
+fastapi==0.122.0
+fastapi-cli==0.0.16
+uvicorn==0.38.0
+psycopg2-binary==2.9.11
+python-dotenv==1.2.1
+
