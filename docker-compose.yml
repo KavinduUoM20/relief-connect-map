@@ -4,7 +4,7 @@ services:
   app:
     image: ${DOCKERHUB_USERNAME}/relief-connect-map:latest
     ports:
-      - "8000:8000"
+      - "5000:8000"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
