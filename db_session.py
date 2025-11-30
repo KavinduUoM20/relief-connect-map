@@ -14,38 +14,27 @@ class PostgresSingleton:
                 if not cls._instance:
                     cls._instance = super(PostgresSingleton, cls).__new__(cls)
                     cls._instance.connection = None
-                    try:
-                        cls._instance._init_connection()
-                    except Exception:
-                        cls._instance.connection = None
         return cls._instance
 
-    def _init_connection(self):
-        db_host = os.getenv("DB_HOST")
-        if not db_host:
-            raise ValueError("DB_HOST environment variable is required")
-        
-        self.connection = psycopg2.connect(
-            host=db_host,
-            port=os.getenv("DB_PORT", "5432"),
-            database=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD")
-        )
-        self.connection.autocommit = True
+    def _get_connection(self):
+        if not self.connection:
+            self.connection = psycopg2.connect(
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT", "5432"),
+                database=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD")
+            )
+            self.connection.autocommit = True
+        return self.connection
 
     def get_cursor(self):
-        if not self.connection:
-            raise ConnectionError("Database connection not initialized")
-        return self.connection.cursor(cursor_factory=RealDictCursor)
+        return self._get_connection().cursor(cursor_factory=RealDictCursor)
 
     def execute_query(self, query, params=None):
-        if not self.connection:
-            raise ConnectionError("Database connection not initialized")
         cur = self.get_cursor()
         cur.execute(query, params)
         try:
             return cur.fetchall()
         except psycopg2.ProgrammingError:
-            # For INSERT/UPDATE/DELETE
             return None
