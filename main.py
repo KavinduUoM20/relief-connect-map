@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+import logging
 from db_session import PostgresSingleton
 
 app = FastAPI()
@@ -24,5 +24,6 @@ def db_health_check():
         db = PostgresSingleton()
         db.execute_query("SELECT 1;")
         return {"status": "up"}
-    except Exception:
-        return {"status": "down"}
+    except Exception as e:
+        logging.error(f"DB health check failed: {e}")
+        return {"status": "down", "error": str(e)}
