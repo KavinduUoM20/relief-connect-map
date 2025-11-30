@@ -39,7 +39,7 @@ jobs:
             export DB_USER=${{ secrets.DB_USER }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/relief-connect-map:latest
-            docker-compose down
-            docker-compose up -d
+            docker-compose down --remove-orphans
+            docker-compose up -d --force-recreate
             docker image prune -f
 
