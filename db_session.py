@@ -13,7 +13,11 @@ class PostgresSingleton:
             with cls._lock:
                 if not cls._instance:
                     cls._instance = super(PostgresSingleton, cls).__new__(cls)
-                    cls._instance._init_connection()
+                    cls._instance.connection = None
+                    try:
+                        cls._instance._init_connection()
+                    except Exception:
+                        cls._instance.connection = None
         return cls._instance
 
     def _init_connection(self):
@@ -31,9 +35,13 @@ class PostgresSingleton:
         self.connection.autocommit = True
 
     def get_cursor(self):
+        if not self.connection:
+            raise ConnectionError("Database connection not initialized")
         return self.connection.cursor(cursor_factory=RealDictCursor)
 
     def execute_query(self, query, params=None):
+        if not self.connection:
+            raise ConnectionError("Database connection not initialized")
         cur = self.get_cursor()
         cur.execute(query, params)
         try:
