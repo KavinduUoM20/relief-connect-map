@@ -17,8 +17,12 @@ class PostgresSingleton:
         return cls._instance
 
     def _init_connection(self):
+        db_host = os.getenv("DB_HOST")
+        if not db_host:
+            raise ValueError("DB_HOST environment variable is required")
+        
         self.connection = psycopg2.connect(
-            host=os.getenv("DB_HOST"),
+            host=db_host,
             port=os.getenv("DB_PORT", "5432"),
             database=os.getenv("DB_NAME"),
             user=os.getenv("DB_USER"),
