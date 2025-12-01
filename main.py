@@ -5,14 +5,11 @@ from db_session import PostgresSingleton
 app = FastAPI()
 
 
-@app.get("/locations")
-def get_locations():
-    data = [
-        {"id": 1, "name": "Colombo", "status": "safe"},
-        {"id": 2, "name": "Gampaha", "status": "flooded"},
-        {"id": 3, "name": "Kegalle", "status": "warning"},
-    ]
-    return {"locations": data}
+@app.get("/emergency_data")
+def get_emergency_data():
+    db = PostgresSingleton()
+    data = db.execute_query("SELECT * FROM relief_locations;")
+    return {"emergency_data": data}
 
 
 @app.get("/health/db")
